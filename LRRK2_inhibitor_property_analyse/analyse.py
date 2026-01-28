@@ -30,7 +30,7 @@ plt.rcParams["legend.fontsize"] = 22
 sns.set(style="whitegrid")  # keep a clean grid background
 
 # ===============================
-# 1. 计算分子性质
+# 1. Calculate molecular properties
 # ===============================
 def calc_properties(smiles):
     mol = Chem.MolFromSmiles(smiles)
@@ -47,12 +47,12 @@ def calc_properties(smiles):
     return props
 
 # ===============================
-# 2. 数据读取 + pIC50计算 + 分类
+# 2. Read data, compute pIC50, and classify activities
 # ===============================
 def prepare_dataset(file_path):
     df = pd.read_csv(file_path)
 
-    # 计算性质
+    # Calculate properties
     props_list = []
     for smi in df["SMILES"]:
         p = calc_properties(smi)
@@ -64,13 +64,13 @@ def prepare_dataset(file_path):
     props_df = pd.DataFrame(props_list)
     df = pd.concat([df, props_df], axis=1)
 
-    # 计算 pIC50
+    # compute pIC50
     df["IC50_numeric"] = pd.to_numeric(df["IC50"], errors="coerce")
     df["pIC50"] = np.nan
     mask_valid = ~df["IC50_numeric"].isna()
     df.loc[mask_valid, "pIC50"] = -np.log10(df.loc[mask_valid, "IC50_numeric"] * 1e-9)
 
-    # 分类
+    # classify activities
     conditions = [
         df["pIC50"] >= 7,
         (df["pIC50"] >= 6) & (df["pIC50"] < 7),
@@ -82,7 +82,7 @@ def prepare_dataset(file_path):
     return df
 
 # ===============================
-# 3. 可视化函数
+# 3. Visualization helpers
 # ===============================
 def plot_property_distributions(df,
                                 props=["MW","LogP","TPSA","RotBond","HBD","RingCount"],
@@ -93,7 +93,7 @@ def plot_property_distributions(df,
                                 spine_width=SPINE_WIDTH,
                                 spine_color=SPINE_COLOR):
     sns.set(style="whitegrid")
-    palette = {"High": "#2ca02c", "Medium": "#1f77b4", "Low": "#d62728"}  # 自定义颜色
+    palette = {"High": "#2ca02c", "Medium": "#1f77b4", "Low": "#d62728"}  # custom colors
 
     for prop in props:
         fig, ax = plt.subplots(figsize=(8, 6))
@@ -104,7 +104,7 @@ def plot_property_distributions(df,
                       jitter=True, alpha=0.85,
                       palette=palette, size=5, ax=ax)
 
-        # 添加 legend
+        # add legend
         legend_elements = [
             plt.Line2D([0], [0], marker='o', color='w', markerfacecolor=palette["High"], markersize=10, label="High"),
             plt.Line2D([0], [0], marker='o', color='w', markerfacecolor=palette["Medium"], markersize=10, label="Medium"),
@@ -115,24 +115,19 @@ def plot_property_distributions(df,
         # Axis labels
         ax.set_xlabel("Activity", fontsize=labelsize, fontname="Arial")
         ax.set_ylabel(prop, fontsize=labelsize, fontname="Arial")
-        # 单独为 LogP 设置 y 轴范围
-        #if prop == "MW":
-            #ax.set_ylim(0, 1200)   # 下限不变，上限设置为 10        
-
-        if prop == "LogP":
-            ax.set_ylim(None, 11)   # 下限不变，上限设置为 10
-            
-        #if prop == "TPSA":
-            ax.set_ylim(0, 250)   # 下限不变，上限设置为 10
-            
-        #if prop == "RotBond":
-            ax.set_ylim(0, 26)   # 下限不变，上限设置为 10
-        
-        #if prop == "HBD":
-            ax.set_ylim(0, 6)   # 下限不变，上限设置为 10
-             
-        #if prop == "RingCount":
-            ax.set_ylim(0, 10)   # 下限不变，上限设置为 10
+        # Set y-axis ranges for specific properties to improve readability
+        if prop == "MW":
+            ax.set_ylim(0, 1200)
+        elif prop == "LogP":
+            ax.set_ylim(None, 11)
+        elif prop == "TPSA":
+            ax.set_ylim(0, 250)
+        elif prop == "RotBond":
+            ax.set_ylim(0, 26)
+        elif prop == "HBD":
+            ax.set_ylim(0, 6)
+        elif prop == "RingCount":
+            ax.set_ylim(0, 10)
             
         
 
@@ -156,7 +151,7 @@ def plot_property_distributions(df,
         print(f"Saved: {out_path}")
 
 # ===============================
-# 4. 基于高活性组均值 ± 标准差定义阈值
+# 4. Define thresholds based on mean ± std of the high-activity group
 # ===============================
 def thresholds_from_errorbar(df, props=["MW","LogP","TPSA","RotBond","HBD","RingCount"]):
     high = df[df["Activity"] == "High"]
@@ -175,13 +170,13 @@ def thresholds_from_errorbar(df, props=["MW","LogP","TPSA","RotBond","HBD","Ring
     return final_thresholds
 
 # ===============================
-# 主程序
+# Main
 # ===============================
 if __name__ == "__main__":
-    # LRRK2抑制剂活性数据集
+    # LRRK2 inhibitors activity dataset
     infile = "LRRK2_inhibitor_bindingdb.csv"
     df = prepare_dataset(infile)
 
-    # 绘图
+    # plotting
     plot_property_distributions(df)
 
