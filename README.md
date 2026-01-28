@@ -2,7 +2,7 @@
 Data and analysis scripts for the paper "A Multistage Virtual Screening Strategy Integrating Molecular Similarity, Deep Learning Scoring, and Molecular Docking towards the Discovery of Novel LRRK2 Inhibitors".
 
 ## Repository overview
-- `LRRK2_inhibitor_property_analyse/`: scripts to compute molecular properties and visualize activity-stratified distributions.
+- `LRRK2_inhibitor_property_analyse/`: scripts to compute molecular physicochemical properties and visualize activity-stratified distributions.
 - `MD/`: inputs for molecular dynamics simulations (topology/inputs for different complexes).
 
 ## Requirements
@@ -16,16 +16,7 @@ conda install -c conda-forge rdkit pandas numpy seaborn matplotlib -y
 
 ## Usage
 
-### 1. Compute properties and generate plots
-
-```bash
-cd LRRK2_inhibitor_property_analyse
-python analyse.py
-```
-
-This reads `LRRK2_inhibitor_bindingdb.csv`, computes molecular properties and pIC50, classifies activities (`High`, `Medium`, `Low`), and writes PNG plots to the `plots/` directory.
-
-### 2. AI-based similarity screening (Ouroboros)
+### 1. AI-based similarity screening (Ouroboros)
 
 ```bash
 export ouroboros_model="Ouroboros_M1c"
@@ -44,4 +35,15 @@ The repository contains an example command for running Ouroboros profiling. See 
 
 [Ouroboros on GitHub](https://github.com/Wang-Lin-boop/Ouroboros)
 
+### 2. Compute physicochemical properties and generate plots
+
+```bash
+cd LRRK2_inhibitor_property_analyse
+python analyse.py
+```
+
+This reads `LRRK2_inhibitor_bindingdb.csv`, computes molecular physicochemical properties and pIC50, classifies activities (`High`, `Medium`, `Low`), and writes PNG plots to the `plots/` directory.
+
 ### 3. Molecular dynamics simulations
+
+All MD simulations are performed by Amber20.
