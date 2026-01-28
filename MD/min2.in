@@ -1,0 +1,12 @@
+Initial minimization position restraints, 10.0 cut
+ &cntrl
+  ntx = 1, irest = 0, ntpr = 500,
+  imin = 1, maxcyc = 5000, ncyc = 2500, ntmin = 1,
+  dx0 = 0.1, drms = 0.0001,
+  ntf = 1, ntb = 1, cut = 10.0, nsnb = 10, 
+  ntc = 1, iwrap = 1,
+  ntr = 1,
+  restraint_wt = 5,
+  restraintmask = ':1-260',
+ /
+
